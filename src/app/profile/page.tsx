@@ -1,41 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import { Phone, Mail, ShieldCheck, Heart, History, LogOut, User as UserIcon } from 'lucide-react';
-import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/context/AuthContext';
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const handleGoogleSignIn = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
-      },
-    });
-  };
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-  };
+  const { user, signInWithGoogle, signOut, isLoading } = useAuth();
 
   const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture || '/images/avatar.jpg';
   const fullName = user?.user_metadata?.full_name || user?.user_metadata?.name || (user?.email ? user.email.split('@')[0] : 'Commuter Guest');
@@ -77,7 +48,7 @@ export default function ProfilePage() {
               {user ? (
                 <button
                   type="button"
-                  onClick={handleSignOut}
+                  onClick={signOut}
                   className="px-4 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/80 text-rose-600 dark:text-rose-400 font-bold text-xs hover:bg-rose-100 transition-colors inline-flex items-center gap-1.5"
                 >
                   <LogOut className="w-4 h-4" /> Sign Out from App
@@ -85,7 +56,7 @@ export default function ProfilePage() {
               ) : (
                 <button
                   type="button"
-                  onClick={handleGoogleSignIn}
+                  onClick={signInWithGoogle}
                   className="px-4 py-2.5 rounded-xl bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-bold text-xs transition-transform active:scale-95 inline-flex items-center gap-2"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24">

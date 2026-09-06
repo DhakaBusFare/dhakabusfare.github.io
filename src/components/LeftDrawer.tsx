@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { X, Settings, Info, MessageSquare, User, Edit3, Sun, Moon, LogIn, LogOut, ShieldCheck } from 'lucide-react';
-import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/context/AuthContext';
 
 interface LeftDrawerProps {
   isOpen: boolean;
@@ -21,19 +21,7 @@ export const LeftDrawer: React.FC<LeftDrawerProps> = ({
   isDark,
   onToggleDarkMode,
 }) => {
-  const [user, setUser] = useState<any>(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  const { user, signInWithGoogle, signOut } = useAuth();
 
   // Keydown Escape Listener
   useEffect(() => {
@@ -46,20 +34,6 @@ export const LeftDrawer: React.FC<LeftDrawerProps> = ({
   }, [onClose]);
 
   if (!isOpen) return null;
-
-  const handleGoogleSignIn = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
-      },
-    });
-  };
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-  };
 
   const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture || '/images/avatar.jpg';
   const fullName = user?.user_metadata?.full_name || user?.user_metadata?.name || (user?.email ? user.email.split('@')[0] : 'Commuter Guest');
@@ -111,7 +85,7 @@ export const LeftDrawer: React.FC<LeftDrawerProps> = ({
             {user ? (
               <button
                 type="button"
-                onClick={handleSignOut}
+                onClick={signOut}
                 className="w-full mt-2 py-2 px-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-rose-100 transition-colors"
               >
                 <LogOut className="w-3.5 h-3.5" /> Sign Out
@@ -119,7 +93,7 @@ export const LeftDrawer: React.FC<LeftDrawerProps> = ({
             ) : (
               <button
                 type="button"
-                onClick={handleGoogleSignIn}
+                onClick={signInWithGoogle}
                 className="w-full mt-2 py-2.5 px-3 rounded-xl bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-bold text-xs flex items-center justify-center gap-2 transition-transform active:scale-95"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24">

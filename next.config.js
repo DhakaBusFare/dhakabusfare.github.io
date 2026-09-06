@@ -1,21 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  output: 'export',
+  trailingSlash: true,
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },
-    ],
-  },
-  async rewrites() {
-    return [
       {
-        source: '/api/v1/:path*',
-        destination: 'http://127.0.0.1:8000/api/v1/:path*',
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
       },
-    ];
+    ],
   },
 };
 

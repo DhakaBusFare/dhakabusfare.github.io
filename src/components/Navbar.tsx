@@ -1,62 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, Sun, Moon, Bus, ShieldCheck, LogIn, LogOut } from 'lucide-react';
-import { supabase } from '@/lib/supabaseClient';
+import { Bus, ShieldCheck, LogOut } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
-interface NavbarProps {
-  onOpenDrawer: () => void;
-  isDark: boolean;
-  onToggleDarkMode: () => void;
-}
-
-export const Navbar: React.FC<NavbarProps> = ({ onOpenDrawer, isDark, onToggleDarkMode }) => {
-  const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Helper to process session and cleanly remove #access_token=... from address bar
-    const checkAndCleanUrlHash = (session: any) => {
-      if (session?.user) {
-        setUser(session.user);
-        if (typeof window !== 'undefined' && window.location.hash.includes('access_token')) {
-          // Replace URL hash with clean path (http://127.0.0.1:3000/)
-          window.history.replaceState(null, '', window.location.pathname);
-        }
-      } else {
-        setUser(null);
-      }
-      setIsLoading(false);
-    };
-
-    // 1. Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      checkAndCleanUrlHash(session);
-    });
-
-    // 2. Listen to Auth State Changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      checkAndCleanUrlHash(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const handleGoogleSignIn = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
-      },
-    });
-  };
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-  };
+export const Navbar: React.FC = () => {
+  const { user, signInWithGoogle, signOut, isLoading } = useAuth();
 
   const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture || '/images/avatar.jpg';
   const fullName = user?.user_metadata?.full_name || user?.user_metadata?.name || (user?.email ? user.email.split('@')[0] : 'Guest User');
@@ -64,59 +15,48 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDrawer, isDark, onToggleDa
 
   return (
     <header className="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 transition-colors">
-      <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Brand Logo & Hamburger Drawer Trigger Icon */}
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={onOpenDrawer}
-            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-emerald-100 hover:text-emerald-700 transition-colors"
-            title="Open Left Profile Drawer"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
-              <Bus className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="font-black text-lg text-slate-900 dark:text-white leading-tight flex items-center gap-1.5">
-                DhakaBusFare <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-bold">Supabase</span>
-              </h1>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">ঢাকা বাস ভাড়া ও রুট গাইড</p>
-            </div>
-          </Link>
-        </div>
+      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+        
+        {/* Brand Logo */}
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+            <Bus className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="font-black text-lg text-slate-900 dark:text-white leading-tight flex items-center gap-1.5">
+              DhakaBusFare
+            </h1>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">ঢাকা বাস ভাড়া ও রুট গাইড</p>
+          </div>
+        </Link>
 
         {/* Desktop Nav Controls & Supabase User Profile Pic */}
-        <div className="flex items-center gap-3 md:gap-4">
-          <nav className="hidden md:flex items-center gap-1 text-sm font-semibold">
-            <Link href="/" className="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-400 hover:bg-emerald-100 transition-colors">
+        <div className="flex items-center gap-3 md:gap-6">
+          <nav className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-semibold">
+            <Link href="/" className="px-3 py-1.5 rounded-xl text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               Home
             </Link>
+            <a href="/#features" className="px-3 py-1.5 rounded-xl text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              Features
+            </a>
+            <a href="/#how" className="px-3 py-1.5 rounded-xl text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              How it works
+            </a>
+            <a href="/#download" className="px-3 py-1.5 rounded-xl text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              Download
+            </a>
           </nav>
-
-          {/* Dark Mode Toggle Button */}
-          <button
-            type="button"
-            onClick={onToggleDarkMode}
-            className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors focus:outline-none"
-            aria-label="Toggle Theme"
-          >
-            {isDark ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-700" />}
-          </button>
 
           {/* USER PROFILE PIC / AUTH BUTTON */}
           {user ? (
             <div className="relative group">
               <Link href="/profile" className="flex items-center gap-2 p-1 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all">
-                <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-emerald-500/80 dark:border-emerald-400 shadow-md shadow-emerald-500/10 group-hover:scale-105 transition-transform">
+                <div className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-emerald-500/80 dark:border-emerald-400 shadow-md shadow-emerald-500/10 group-hover:scale-105 transition-transform">
                   <Image
                     src={avatarUrl}
                     alt={fullName}
-                    width={40}
-                    height={40}
+                    width={36}
+                    height={36}
                     className="object-cover w-full h-full"
                     unoptimized
                   />
@@ -150,11 +90,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDrawer, isDark, onToggleDa
                 <div className="flex items-center justify-between text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
                   <span className="flex items-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5" />
-                    Supabase User
+                    Verified User
                   </span>
                   <button
                     type="button"
-                    onClick={handleSignOut}
+                    onClick={signOut}
                     className="text-rose-500 hover:underline font-bold flex items-center gap-1"
                   >
                     <LogOut className="w-3 h-3" /> Sign Out
@@ -165,8 +105,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDrawer, isDark, onToggleDa
           ) : (
             <button
               type="button"
-              onClick={handleGoogleSignIn}
-              className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 text-xs font-bold transition-all flex items-center gap-2 border border-slate-200 dark:border-slate-700"
+              onClick={signInWithGoogle}
+              className="px-3.5 py-2 rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 text-xs font-bold transition-all flex items-center gap-2"
             >
               <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
