@@ -16,6 +16,11 @@ const nextConfig = {
       },
     ],
   },
+  turbopack: {
+    resolveAlias: {
+      canvas: './src/lib/empty.js',
+    },
+  },
 };
 
 module.exports = nextConfig;

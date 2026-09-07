@@ -6,33 +6,25 @@ import './globals.css';
 import { Navbar } from '@/components/Navbar';
 import { PdfModal } from '@/components/PdfModal';
 import { HotlinesModal } from '@/components/HotlinesModal';
-import { DocumentsModal } from '@/components/DocumentsModal';
 import { BottomNav } from '@/components/BottomNav';
 import { AuthProvider } from '@/context/AuthContext';
+import { RouteDocument } from '@/lib/services/documentService';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isPdfOpen, setIsPdfOpen] = useState(false);
-  const [pdfTitle, setPdfTitle] = useState('BRTA Gazette');
+  const [selectedDocument, setSelectedDocument] = useState<RouteDocument | null>(null);
   const [isHotlinesOpen, setIsHotlinesOpen] = useState(false);
-  const [isDocumentsOpen, setIsDocumentsOpen] = useState(false);
 
   // Close all open modals automatically on route navigation
   useEffect(() => {
     setIsPdfOpen(false);
     setIsHotlinesOpen(false);
-    setIsDocumentsOpen(false);
   }, [pathname]);
-
-  const handleOpenPdf = (title?: string) => {
-    if (title) setPdfTitle(title);
-    setIsPdfOpen(true);
-  };
 
   const closeAllModals = () => {
     setIsPdfOpen(false);
     setIsHotlinesOpen(false);
-    setIsDocumentsOpen(false);
   };
 
   return (
@@ -52,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
           <PdfModal
             isOpen={isPdfOpen}
-            busName={pdfTitle}
+            document={selectedDocument}
             onClose={() => setIsPdfOpen(false)}
           />
 
@@ -61,15 +53,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             onClose={() => setIsHotlinesOpen(false)}
           />
 
-          <DocumentsModal
-            isOpen={isDocumentsOpen}
-            onClose={() => setIsDocumentsOpen(false)}
-            onOpenPdf={handleOpenPdf}
-          />
-
           <BottomNav
-            onOpenDocuments={() => { setIsHotlinesOpen(false); setIsDocumentsOpen(true); }}
-            onOpenHotlines={() => { setIsDocumentsOpen(false); setIsHotlinesOpen(true); }}
+            onOpenHotlines={() => { setIsHotlinesOpen(false); setIsHotlinesOpen(true); }}
             onCloseModals={closeAllModals}
           />
         </AuthProvider>
@@ -77,3 +62,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
+

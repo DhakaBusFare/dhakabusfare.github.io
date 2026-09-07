@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
 import { KeyRound, Mail, CheckCircle2, ArrowLeft, ShieldCheck, AlertCircle, Loader2 } from 'lucide-react';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('');
@@ -44,7 +45,15 @@ export default function ResetPasswordPage() {
     }
 
     setIsLoading(true);
-    const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/reset-password/` : undefined;
+    const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/update-password` : undefined;
+
+    // Client-side rate limiting (3 requests / 15 mins)
+    const rateLimit = checkRateLimit('reset_password', 3, 15 * 60 * 1000);
+    if (!rateLimit.success) {
+      setIsLoading(false);
+      setErrorMessage(`Password reset rate limit exceeded. Please wait ${rateLimit.retryAfter} seconds before trying again.`);
+      return;
+    }
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,

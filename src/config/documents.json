@@ -1,0 +1,30 @@
+[
+  {
+    "id": "a101-a202",
+    "name": "Route A101 - A202 Official Gazette",
+    "filename": "a101-a202.pdf",
+    "subfolder": "route_pdfs",
+    "description": "Official Bus Route Schedule & Distance Breakdown (A101 - A202)"
+  },
+  {
+    "id": "a207-a280",
+    "name": "Route A207 - A280 Official Gazette",
+    "filename": "a207-a280.pdf",
+    "subfolder": "route_pdfs",
+    "description": "Official Bus Route Schedule & Distance Breakdown (A207 - A280)"
+  },
+  {
+    "id": "a285-a356",
+    "name": "Route A285 - A356 Official Gazette",
+    "filename": "a285-a356.pdf",
+    "subfolder": "route_pdfs",
+    "description": "Official Bus Route Schedule & Distance Breakdown (A285 - A356)"
+  },
+  {
+    "id": "a362-a459",
+    "name": "Route A362 - A459 Official Gazette",
+    "filename": "a362-a459.pdf",
+    "subfolder": "route_pdfs",
+    "description": "Official Bus Route Schedule & Distance Breakdown (A362 - A459)"
+  }
+]
