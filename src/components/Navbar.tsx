@@ -36,18 +36,18 @@ export const Navbar: React.FC = () => {
             <Link href="/" className="px-3 py-1.5 rounded-xl text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               Home
             </Link>
-            <a href="/#features" className="px-3 py-1.5 rounded-xl text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+            <Link href="/#features" className="px-3 py-1.5 rounded-xl text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               Features
-            </a>
-            <a href="/#how" className="px-3 py-1.5 rounded-xl text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+            </Link>
+            <Link href="/#how" className="px-3 py-1.5 rounded-xl text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               How it works
-            </a>
+            </Link>
             <Link href="/documents" className="px-3 py-1.5 rounded-xl text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               Documents
             </Link>
-            <a href="/#download" className="px-3 py-1.5 rounded-xl text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+            <Link href="/#download" className="px-3 py-1.5 rounded-xl text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               Download
-            </a>
+            </Link>
           </nav>
 
           {/* USER PROFILE PIC / AUTH BUTTON */}
